@@ -45,3 +45,8 @@ get '/admin' do
   haml :admin
 end
 
+get '/api' do
+  content_type :json
+  { secret_coffee_time: SecretCoffee.secret_coffee_time? }.to_json
+end
+
