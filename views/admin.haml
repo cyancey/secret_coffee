@@ -1,2 +1,13 @@
 - @secret_coffees.each do |secret_coffee|
-  = "#{secret_coffee.time.in_time_zone("Pacific Time (US & Canada)")} - Notification Sent: #{secret_coffee.notification_sent}"
+  .secret-coffee
+    = "#{secret_coffee.time.in_time_zone("Pacific Time (US & Canada)").strftime("%A - %m/%d/%Y - %I:%M%p")}"
+    %ul.secret-coffee-details
+      %li
+        = "Notification Sent: #{secret_coffee.notification_sent}"
+      - if secret_coffee.coffee_quote
+        %li
+          Quote:
+          .quote
+            ="\"#{secret_coffee.coffee_quote.quote}\""
+          .said_by
+            = "- #{secret_coffee.coffee_quote.said_by}"
