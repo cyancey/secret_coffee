@@ -132,3 +132,16 @@ get '/api' do
   end
 end
 
+get '/slack_request' do
+  if SecretCoffee.secret_coffee_time?
+    text = "It's secret coffee time."
+  elsif SecretCoffee.already_happened_today
+    text = "It's not secret coffee time. Today's run already happened."
+  elsif SecretCoffee.happening_today
+    text = "It's not secret coffee time. A run is scheduled for today."
+  else
+    text = "It's not secret coffee time. A run is not scheduled for today."
+  end
+  content_type :json
+  {text: text}.to_json
+end
