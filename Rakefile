@@ -14,8 +14,8 @@ namespace :secret_coffee do
     todays_coffee_runs = SecretCoffee.where(time: now.beginning_of_day..now.end_of_day)
 
     send_notification = todays_coffee_runs.map do |secret_coffee|
-      !secret_coffee.notification_sent && (secret_coffee.time < now)
-    end.include(true)
+      !secret_coffee.notification_sent && (secret_coffee.time <= now)
+    end.include?(true)
 
     if send_notification
       ## send notification
@@ -24,7 +24,6 @@ namespace :secret_coffee do
       todays_coffee_runs.each {|secret_coffee| secret_coffee.update_attributes(notification_sent: true)}
     end
 
-    end
   end
 
 end
