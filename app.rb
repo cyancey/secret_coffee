@@ -3,7 +3,10 @@ require 'sinatra/activerecord'
 require './environments'
 require 'active_support/all'
 require 'haml'
+require 'httparty'
+require 'dotenv'
 
+Dotenv.load
 
 class SecretCoffee < ActiveRecord::Base
   validate :one_secret_coffee_run_per_day, on: :create
@@ -32,6 +35,14 @@ class SecretCoffee < ActiveRecord::Base
     if coffee_runs_today.size > 0
       errors.add(:base, 'You can only do one secret coffee run per day')
     end
+  end
+end
+
+module Slack
+  extend self
+
+  def post_message(message)
+    HTTParty.post(ENV['SLACK_WEBHOOK'], body: {text: message}.to_json)
   end
 end
 

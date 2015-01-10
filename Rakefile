@@ -19,7 +19,7 @@ namespace :secret_coffee do
 
     if send_notification
       ## send notification
-
+      Slack.post_message("Drop what you're doing. It's time for secret coffee.")
       ## mark all todays runs as having notifications sent
       todays_coffee_runs.each {|secret_coffee| secret_coffee.update_attributes(notification_sent: true)}
     end

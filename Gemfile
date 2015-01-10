@@ -11,6 +11,8 @@ gem 'awesome_print'
 gem 'activesupport'
 gem 'shotgun'
 gem 'haml'
+gem 'httparty'
+gem 'dotenv'
 
 group :development do
  gem 'sqlite3'
