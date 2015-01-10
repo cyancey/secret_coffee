@@ -142,6 +142,7 @@ get '/slack_request' do
   else
     text = "It's not secret coffee time. A run is not scheduled for today."
   end
-  content_type :json
-  {text: text}.to_json
+
+  content_type :text
+  text
 end
