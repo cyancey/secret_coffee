@@ -1,1 +1,8 @@
 = "#{@secret_coffee_time ? "It's secret coffee time." : "It's not secret coffee time."}"
+- if @quote
+  %h3 Coffee Quote
+  .coffee-quote
+    .quote
+      = "\"#{@quote.quote}\""
+    .said-by
+      = "- #{@quote.said_by}"

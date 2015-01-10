@@ -73,6 +73,12 @@ end
 
 get '/' do
   @secret_coffee_time = SecretCoffee.secret_coffee_time?
+  if @secret_coffee_time
+    now = Time.now.in_time_zone("Pacific Time (US & Canada)")
+    @secret_coffee = SecretCoffee.where(time: now.beginning_of_day..now.end_of_day).last
+    @quote = @secret_coffee.coffee_quote if @secret_coffee
+  end
+
   haml :home
 end
 
