@@ -27,6 +27,24 @@ class SecretCoffee < ActiveRecord::Base
     end.include?(true)
   end
 
+  def self.happening_today
+    now = Time.now.in_time_zone("Pacific Time (US & Canada)")
+
+    @secret_coffee = SecretCoffee.where(time: now.beginning_of_day..now.end_of_day).last
+    !@secret_coffee.nil?
+  end
+
+  def self.already_happened_today
+    now = Time.now.in_time_zone("Pacific Time (US & Canada)")
+
+    @secret_coffee = SecretCoffee.where(time: now.beginning_of_day..now.end_of_day).last
+    if @secret_coffee
+      Time.now > (@secret_coffee.time + 15.minutes)
+    else
+      false
+    end
+  end
+
   def to_slack_message
     message = "Drop what you're doing. It's time for secret coffee."
     quote = self.coffee_quote
@@ -73,10 +91,14 @@ end
 
 get '/' do
   @secret_coffee_time = SecretCoffee.secret_coffee_time?
+
   if @secret_coffee_time
     now = Time.now.in_time_zone("Pacific Time (US & Canada)")
     @secret_coffee = SecretCoffee.where(time: now.beginning_of_day..now.end_of_day).last
     @quote = @secret_coffee.coffee_quote if @secret_coffee
+  else
+    @already_happened_today = SecretCoffee.already_happened_today
+    @happening_today = SecretCoffee.happening_today
   end
 
   haml :home
@@ -94,15 +116,9 @@ get '/api' do
   @secret_coffee = SecretCoffee.where(time: now.beginning_of_day..now.end_of_day).last
 
   if !SecretCoffee.secret_coffee_time?
-    happening_today = !@secret_coffee.nil?
-    if @secret_coffee
-      already_happened = Time.now > (@secret_coffee.time + 15.minutes)
-    else
-      already_happened = false
-    end
     { secret_coffee_time: false,
-      happening_today: happening_today,
-      already_happened: already_happened }.to_json
+      happening_today: SecretCoffee.happening_today,
+      already_happened: SecretCoffee.already_happened_today }.to_json
   else
     @quote = @secret_coffee.coffee_quote
     if @quote
