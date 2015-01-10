@@ -11,13 +11,21 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150110052445) do
+ActiveRecord::Schema.define(version: 20150110184800) do
+
+  create_table "coffee_quotes", force: :cascade do |t|
+    t.text     "quote",      null: false
+    t.string   "said_by"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "secret_coffees", force: :cascade do |t|
     t.datetime "time"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",                        null: false
+    t.datetime "updated_at",                        null: false
     t.boolean  "notification_sent", default: false
+    t.integer  "coffee_quote_id"
   end
 
 end

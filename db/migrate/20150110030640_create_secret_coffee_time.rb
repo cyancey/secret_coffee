@@ -2,7 +2,7 @@ class CreateSecretCoffeeTime < ActiveRecord::Migration
   def up
     create_table :secret_coffees do |t|
       t.datetime :time
-      t.timestamps
+      t.timestamps null: false
     end
   end
 

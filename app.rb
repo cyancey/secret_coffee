@@ -10,11 +10,12 @@ Dotenv.load
 
 class SecretCoffee < ActiveRecord::Base
   validate :one_secret_coffee_run_per_day, on: :create
+  belongs_to :coffee_quote
 
   def self.set_coffee_time
     now = Time.now.in_time_zone("Pacific Time (US & Canada)")
     coffee_time = DateTime.new(now.year, now.month, now.day, 13, 0, 0, '-8') + rand(100).minutes
-    SecretCoffee.create(time: coffee_time)
+    SecretCoffee.create(time: coffee_time, coffee_quote: CoffeeQuote.random)
   end
 
   def self.secret_coffee_time?
@@ -35,6 +36,14 @@ class SecretCoffee < ActiveRecord::Base
     if coffee_runs_today.size > 0
       errors.add(:base, 'You can only do one secret coffee run per day')
     end
+  end
+end
+
+class CoffeeQuote < ActiveRecord::Base
+  has_many :secret_coffees
+
+  def self.random
+    CoffeeQuote.offset(rand(CoffeeQuote.count)).first
   end
 end
 
