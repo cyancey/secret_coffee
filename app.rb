@@ -89,11 +89,21 @@ end
 
 get '/api' do
   content_type :json
+
+  now = Time.now.in_time_zone("Pacific Time (US & Canada)")
+  @secret_coffee = SecretCoffee.where(time: now.beginning_of_day..now.end_of_day).last
+
   if !SecretCoffee.secret_coffee_time?
-    { secret_coffee_time: false }.to_json
+    happening_today = !@secret_coffee.nil?
+    if @secret_coffee
+      already_happened = Time.now > (@secret_coffee.time + 15.minutes)
+    else
+      already_happened = false
+    end
+    { secret_coffee_time: false,
+      happening_today: happening_today,
+      already_happened: already_happened }.to_json
   else
-    now = Time.now.in_time_zone("Pacific Time (US & Canada)")
-    @secret_coffee = SecretCoffee.where(time: now.beginning_of_day..now.end_of_day).last
     @quote = @secret_coffee.coffee_quote
     if @quote
       { secret_coffee_time: true,
