@@ -27,8 +27,8 @@ class SecretCoffee < ActiveRecord::Base
   private
 
   def one_secret_coffee_run_per_day
-    today = Date.today.in_time_zone("Pacific Time (US & Canada)")
-    coffee_runs_today = SecretCoffee.where(time: today.beginning_of_day..today.end_of_day)
+    now = Time.now.in_time_zone("Pacific Time (US & Canada)")
+    coffee_runs_today = SecretCoffee.where(time: now.beginning_of_day..now.end_of_day)
     if coffee_runs_today.size > 0
       errors.add(:base, 'You can only do one secret coffee run per day')
     end
@@ -38,5 +38,10 @@ end
 get '/' do
   @secret_coffee_time = SecretCoffee.secret_coffee_time?
   haml :home
+end
+
+get '/admin' do
+  @secret_coffees = SecretCoffee.all
+  haml :admin
 end
 
