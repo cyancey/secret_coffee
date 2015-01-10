@@ -8,6 +8,9 @@ gem 'sinatra-flash'
 gem 'sinatra-redirect-with-flash'
 gem 'rake'
 gem 'awesome_print'
+gem 'activesupport'
+gem 'shotgun'
+gem 'haml'
 
 group :development do
  gem 'sqlite3'

@@ -18,6 +18,8 @@ GEM
     awesome_print (1.2.0)
     bond (0.5.1)
     builder (3.2.2)
+    haml (4.0.5)
+      tilt
     i18n (0.7.0)
     json (1.8.2)
     minitest (5.5.1)
@@ -36,6 +38,8 @@ GEM
       rack (>= 1.0)
       rack-test (~> 0.6.2)
       ripl (>= 0.7.0)
+    shotgun (0.9)
+      rack (>= 1.0)
     sinatra (1.4.5)
       rack (~> 1.4)
       rack-protection (~> 1.4)
@@ -63,9 +67,12 @@ PLATFORMS
 
 DEPENDENCIES
   activerecord
+  activesupport
   awesome_print
+  haml
   pg
   rake
+  shotgun
   sinatra
   sinatra-activerecord
   sinatra-flash
