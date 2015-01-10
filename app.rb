@@ -15,6 +15,7 @@ class SecretCoffee < ActiveRecord::Base
   def self.set_coffee_time
     now = Time.now.in_time_zone("Pacific Time (US & Canada)")
     coffee_time = DateTime.new(now.year, now.month, now.day, 13, 0, 0, '-8') + rand(100).minutes
+    # coffee_time = Time.now
     SecretCoffee.create(time: coffee_time, coffee_quote: CoffeeQuote.random)
   end
 
@@ -25,7 +26,15 @@ class SecretCoffee < ActiveRecord::Base
     todays_secret_coffees.map do |secret_coffee|
       (now < (secret_coffee.time + 15.minutes)) && (now > secret_coffee.time)
     end.include?(true)
+  end
 
+  def to_slack_message
+    message = "Drop what you're doing. It's time for secret coffee."
+    quote = self.coffee_quote
+    if self.coffee_quote
+      message << "\n\n#{quote.to_slack_message}"
+    end
+    message
   end
 
   private
@@ -44,6 +53,10 @@ class CoffeeQuote < ActiveRecord::Base
 
   def self.random
     CoffeeQuote.offset(rand(CoffeeQuote.count)).first
+  end
+
+  def to_slack_message
+    "\"#{self.quote}\"\n- #{self.said_by}"
   end
 end
 
