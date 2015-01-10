@@ -16,10 +16,10 @@ class SecretCoffee < ActiveRecord::Base
 
   def self.secret_coffee_time?
     now = Time.now.in_time_zone("Pacific Time (US & Canada)")
-    todays_secret_coffees = SecretCoffee.where(time: now.beginning_of_day..now.end_of_day).to_a
+    todays_secret_coffees = SecretCoffee.where(time: now.beginning_of_day..now.end_of_day)
 
     todays_secret_coffees.map do |secret_coffee|
-      (secret_coffee.time.in_time_zone("Pacific Time (US & Canada)") >= now) && (secret_coffee.time <= (now.in_time_zone("Pacific Time (US & Canada)") + 15.minutes))
+      (now < (secret_coffee.time + 15.minutes)) && (now > secret_coffee.time)
     end.include?(true)
 
   end
