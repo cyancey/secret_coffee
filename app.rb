@@ -105,8 +105,12 @@ get '/' do
 end
 
 get '/admin' do
-  @secret_coffees = SecretCoffee.order(:time)
-  haml :admin
+  if params[:pw] == ENV['ADMIN_PASSWORD']
+    @secret_coffees = SecretCoffee.order(:time)
+    haml :admin
+  else
+    redirect to('/')
+  end
 end
 
 get '/api' do
