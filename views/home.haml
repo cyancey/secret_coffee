@@ -1,10 +1,5 @@
-= "#{@secret_coffee_time ? "It's secret coffee time." : "It's not secret coffee time."}"
-- unless @secret_coffee_time
-  - if @already_happened_today
-    = " Today's run already happened."
-  - else
-    = "#{@scheduled_today ? " A run is scheduled for today." : " A run is not scheduled for today."}"
-- if @quote
+= "#{@secret_coffee_status_message}"
+- if @secret_coffee_time && @quote
   %h3 Coffee Quote
   .coffee-quote
     .quote

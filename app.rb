@@ -44,6 +44,18 @@ class SecretCoffee < ActiveRecord::Base
     end
   end
 
+  def self.status_message
+    if SecretCoffee.secret_coffee_time?
+      message = "It's secret coffee time."
+    elsif SecretCoffee.already_happened_today
+      message = "It's not secret coffee time. Today's run already happened."
+    elsif SecretCoffee.scheduled_today
+      message = "It's not secret coffee time. A run is scheduled for today."
+    else
+      message = "It's not secret coffee time. A run is not scheduled for today."
+    end
+  end
+
   def to_slack_message
     message = "Drop what you're doing. It's time for secret coffee."
     quote = self.coffee_quote
@@ -89,16 +101,11 @@ module Slack
 end
 
 get '/' do
+  now = Time.now.in_time_zone("Pacific Time (US & Canada)")
   @secret_coffee_time = SecretCoffee.secret_coffee_time?
-
-  if @secret_coffee_time
-    now = Time.now.in_time_zone("Pacific Time (US & Canada)")
-    @secret_coffee = SecretCoffee.where(time: now.beginning_of_day..now.end_of_day).last
-    @quote = @secret_coffee.coffee_quote if @secret_coffee
-  else
-    @already_happened_today = SecretCoffee.already_happened_today
-    @scheduled_today = SecretCoffee.scheduled_today
-  end
+  @secret_coffee_status_message = SecretCoffee.status_message
+  @secret_coffee = SecretCoffee.where(time: now.beginning_of_day..now.end_of_day).last
+  @quote = @secret_coffee.coffee_quote if @secret_coffee
 
   haml :home
 end
@@ -136,16 +143,6 @@ get '/api' do
 end
 
 get '/slack_request' do
-  if SecretCoffee.secret_coffee_time?
-    text = "It's secret coffee time."
-  elsif SecretCoffee.already_happened_today
-    text = "It's not secret coffee time. Today's run already happened."
-  elsif SecretCoffee.scheduled_today
-    text = "It's not secret coffee time. A run is scheduled for today."
-  else
-    text = "It's not secret coffee time. A run is not scheduled for today."
-  end
-
   content_type :text
-  text
+  SecretCoffee.status_message
 end
