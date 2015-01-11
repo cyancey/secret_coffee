@@ -128,15 +128,18 @@ get '/api' do
   if !SecretCoffee.secret_coffee_time?
     { secret_coffee_time: false,
       scheduled_today: SecretCoffee.scheduled_today,
-      already_happened: SecretCoffee.already_happened_today }.to_json
+      already_happened: SecretCoffee.already_happened_today,
+      status_message: SecretCoffee.status_message }.to_json
   else
     @quote = @secret_coffee.coffee_quote
     if @quote
       { secret_coffee_time: true,
+        status_message: SecretCoffee.status_message,
         coffee_quote: {quote: @quote.quote,
                        said_by: @quote.said_by}}.to_json
     else
       { secret_coffee_time: true,
+        status_message: SecretCoffee.status_message,
         coffee_quote: nil}.to_json
     end
   end
