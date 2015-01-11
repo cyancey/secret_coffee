@@ -1,6 +1,5 @@
 require 'sinatra'
 require 'sinatra/activerecord'
-require './environments'
 require 'active_support/all'
 require 'haml'
 require 'httparty'
