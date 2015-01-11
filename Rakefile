@@ -3,9 +3,12 @@ require 'sinatra/activerecord/rake'
 
 namespace :secret_coffee do
 
-  desc 'Set secret coffee time for today'
+  desc 'Set secret coffee time for today if weekday'
   task :set_time do
-    SecretCoffee.set_coffee_time
+    now = Time.now.in_time_zone("Pacific Time (US & Canada)")
+    unless now.wday == 6 || now.wday == 0 #unless today is a Saturday or Sunday
+      SecretCoffee.set_coffee_time
+    end
   end
 
   desc "Send notification for secret coffee if it hasn't been sent"
