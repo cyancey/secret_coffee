@@ -3,7 +3,7 @@
   - if @already_happened_today
     = " Today's run already happened."
   - else
-    = "#{@happening_today ? " A run is scheduled for today." : " A run is not scheduled for today."}"
+    = "#{@scheduled_today ? " A run is scheduled for today." : " A run is not scheduled for today."}"
 - if @quote
   %h3 Coffee Quote
   .coffee-quote

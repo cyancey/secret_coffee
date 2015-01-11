@@ -27,7 +27,7 @@ class SecretCoffee < ActiveRecord::Base
     end.include?(true)
   end
 
-  def self.happening_today
+  def self.scheduled_today
     now = Time.now.in_time_zone("Pacific Time (US & Canada)")
 
     @secret_coffee = SecretCoffee.where(time: now.beginning_of_day..now.end_of_day).last
@@ -98,7 +98,7 @@ get '/' do
     @quote = @secret_coffee.coffee_quote if @secret_coffee
   else
     @already_happened_today = SecretCoffee.already_happened_today
-    @happening_today = SecretCoffee.happening_today
+    @scheduled_today = SecretCoffee.scheduled_today
   end
 
   haml :home
@@ -121,7 +121,7 @@ get '/api' do
 
   if !SecretCoffee.secret_coffee_time?
     { secret_coffee_time: false,
-      happening_today: SecretCoffee.happening_today,
+      scheduled_today: SecretCoffee.scheduled_today,
       already_happened: SecretCoffee.already_happened_today }.to_json
   else
     @quote = @secret_coffee.coffee_quote
@@ -141,7 +141,7 @@ get '/slack_request' do
     text = "It's secret coffee time."
   elsif SecretCoffee.already_happened_today
     text = "It's not secret coffee time. Today's run already happened."
-  elsif SecretCoffee.happening_today
+  elsif SecretCoffee.scheduled_today
     text = "It's not secret coffee time. A run is scheduled for today."
   else
     text = "It's not secret coffee time. A run is not scheduled for today."
