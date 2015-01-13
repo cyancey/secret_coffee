@@ -13,7 +13,7 @@ class SecretCoffee < ActiveRecord::Base
 
   def self.set_coffee_time
     now = Time.now.in_time_zone("Pacific Time (US & Canada)")
-    coffee_time = DateTime.new(now.year, now.month, now.day, 13, 0, 0, '-8') + rand(100).minutes
+    coffee_time = DateTime.new(now.year, now.month, now.day, 14, 0, 0, '-8') + rand(55).minutes
     SecretCoffee.create(time: coffee_time, coffee_quote: CoffeeQuote.random)
   end
 
