@@ -1,0 +1,38 @@
+%form{action: '/settings', method: 'post'}
+	%label
+		Start Time for Range
+	.time-fields
+		%select{name: 'start-hour'}
+			- (1..12).to_a.each do |hour|
+				%option{value: hour}
+					= hour.to_s.rjust(2, '0')
+		%select{name: 'start-minutes'}
+			- (0..59).to_a.each do |minute|
+				%option{value: minute}
+					= minute.to_s.rjust(2, '0')
+		%select{name: 'start-period'}
+			- ['AM', 'PM'].each do |period|
+				%option{value: period}
+					= period
+
+	%br
+
+	%label
+		End Time for Range
+	.time-fields
+		%select{name: 'end-hour'}
+			- (1..12).to_a.each do |hour|
+				%option{value: hour}
+					= hour.to_s.rjust(2, '0')
+		%select{name: 'end-minutes'}
+			- (0..59).to_a.each do |minute|
+				%option{value: minute}
+					= minute.to_s.rjust(2, '0')
+		%select{name: 'end-period'}
+			- ['AM', 'PM'].each do |period|
+				%option{value: period}
+					= period
+
+	%br
+	
+	%input{type: 'submit', value: 'Submit'}

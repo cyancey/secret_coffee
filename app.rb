@@ -7,18 +7,25 @@ require 'dotenv'
 
 Dotenv.load
 
+class SecretCoffeeSettings < ActiveRecord::Base
+  validates :range_start_time, presence: true
+  validates :range_length_minutes, presence: true
+end
+
 class SecretCoffee < ActiveRecord::Base
   validate :one_secret_coffee_run_per_day, on: :create
   belongs_to :coffee_quote
 
-  def self.set_coffee_time
+  def now
     now = Time.now.in_time_zone("Pacific Time (US & Canada)")
-    coffee_time = DateTime.new(now.year, now.month, now.day, 13, 0, 0, '-8') + rand(100).minutes
+  end
+
+  def self.set_coffee_time
+    coffee_time = Time.new(now.year, now.month, now.day, 13) + rand(100).minutes
     SecretCoffee.create(time: coffee_time, coffee_quote: CoffeeQuote.random)
   end
 
   def self.secret_coffee_time?
-    now = Time.now.in_time_zone("Pacific Time (US & Canada)")
     todays_secret_coffees = SecretCoffee.where(time: now.beginning_of_day..now.end_of_day)
 
     todays_secret_coffees.map do |secret_coffee|
@@ -27,15 +34,11 @@ class SecretCoffee < ActiveRecord::Base
   end
 
   def self.scheduled_today
-    now = Time.now.in_time_zone("Pacific Time (US & Canada)")
-
     @secret_coffee = SecretCoffee.where(time: now.beginning_of_day..now.end_of_day).last
     !@secret_coffee.nil?
   end
 
   def self.already_happened_today
-    now = Time.now.in_time_zone("Pacific Time (US & Canada)")
-
     @secret_coffee = SecretCoffee.where(time: now.beginning_of_day..now.end_of_day).last
     if @secret_coffee
       Time.now > (@secret_coffee.time + 15.minutes)
@@ -148,4 +151,8 @@ end
 get '/slack_request' do
   content_type :text
   SecretCoffee.status_message
+end
+
+get '/settings' do
+  haml :settings
 end
