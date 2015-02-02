@@ -20,6 +20,13 @@ ActiveRecord::Schema.define(version: 20150201185226) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "secret_coffee_settings", force: :cascade do |t|
+    t.datetime "range_start_time"
+    t.integer  "range_length_minutes"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "secret_coffees", force: :cascade do |t|
     t.datetime "time"
     t.datetime "created_at",                        null: false

@@ -13,6 +13,7 @@ gem 'shotgun'
 gem 'haml'
 gem 'httparty'
 gem 'dotenv'
+gem 'sinatra-flash'
 
 group :development do
  gem 'sqlite3'

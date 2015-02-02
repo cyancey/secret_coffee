@@ -1,19 +1,34 @@
+= flash[:success]
+= flash[:error]
+%br
 %form{action: '/settings', method: 'post'}
 	%label
 		Start Time for Range
 	.time-fields
 		%select{name: 'start-hour'}
 			- (1..12).to_a.each do |hour|
-				%option{value: hour}
-					= hour.to_s.rjust(2, '0')
-		%select{name: 'start-minutes'}
+				- if @start_hour == hour
+					%option{value: hour, selected: true}
+						= hour.to_s.rjust(2, '0')
+				- else
+					%option{value: hour}
+						= hour.to_s.rjust(2, '0')	
+		%select{name: 'start-minute'}
 			- (0..59).to_a.each do |minute|
-				%option{value: minute}
-					= minute.to_s.rjust(2, '0')
+				- if @start_minute == minute
+					%option{value: minute, selected: true}
+						= minute.to_s.rjust(2, '0')
+				- else
+					%option{value: minute}
+						= minute.to_s.rjust(2, '0')
 		%select{name: 'start-period'}
 			- ['AM', 'PM'].each do |period|
-				%option{value: period}
-					= period
+				- if @start_period == period
+					%option{value: period, selected: true}
+						= period
+				- else
+					%option{value: period}
+						= period					
 
 	%br
 
@@ -22,16 +37,28 @@
 	.time-fields
 		%select{name: 'end-hour'}
 			- (1..12).to_a.each do |hour|
-				%option{value: hour}
-					= hour.to_s.rjust(2, '0')
-		%select{name: 'end-minutes'}
+				- if @end_hour == hour
+					%option{value: hour, selected: true}
+						= hour.to_s.rjust(2, '0')
+				- else
+					%option{value: hour}
+						= hour.to_s.rjust(2, '0')	
+		%select{name: 'end-minute'}
 			- (0..59).to_a.each do |minute|
-				%option{value: minute}
-					= minute.to_s.rjust(2, '0')
+				- if @end_minute == minute
+					%option{value: minute, selected: true}
+						= minute.to_s.rjust(2, '0')
+				- else
+					%option{value: minute}
+						= minute.to_s.rjust(2, '0')
 		%select{name: 'end-period'}
 			- ['AM', 'PM'].each do |period|
-				%option{value: period}
-					= period
+				- if @end_period == period
+					%option{value: period, selected: true}
+						= period
+				- else
+					%option{value: period}
+						= period
 
 	%br
 	

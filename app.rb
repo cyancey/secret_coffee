@@ -4,10 +4,17 @@ require 'active_support/all'
 require 'haml'
 require 'httparty'
 require 'dotenv'
+require 'sinatra/flash'
+
+enable :sessions
 
 Dotenv.load
 
-class SecretCoffeeSettings < ActiveRecord::Base
+def now
+  Time.now.in_time_zone("Pacific Time (US & Canada)")
+end
+
+class SecretCoffeeSetting < ActiveRecord::Base
   validates :range_start_time, presence: true
   validates :range_length_minutes, presence: true
 end
@@ -16,12 +23,12 @@ class SecretCoffee < ActiveRecord::Base
   validate :one_secret_coffee_run_per_day, on: :create
   belongs_to :coffee_quote
 
-  def now
-    now = Time.now.in_time_zone("Pacific Time (US & Canada)")
-  end
-
   def self.set_coffee_time
-    coffee_time = Time.new(now.year, now.month, now.day, 13) + rand(100).minutes
+    secret_coffee_setting = SecretCoffeeSetting.last
+    secret_coffee_hour = secret_coffee_setting.range_start_time.in_time_zone("Pacific Time (US & Canada)").hour
+    secret_coffee_minute = secret_coffee_setting.range_start_time.in_time_zone("Pacific Time (US & Canada)").min
+    range_length = secret_coffee_setting.range_length_minutes
+    coffee_time = Time.new(now.year, now.month, now.day, secret_coffee_hour, secret_coffee_minute) + rand(range_length).minutes
     SecretCoffee.create(time: coffee_time, coffee_quote: CoffeeQuote.random)
   end
 
@@ -103,6 +110,30 @@ module Slack
   end
 end
 
+def convert_hour_for_no_period(hour, period)
+  if period == 'PM'
+    hour + 12
+  else
+    hour
+  end
+end
+
+def convert_hour_for_use_with_period(hour)
+  if hour > 12
+    hour - 12
+  else
+    hour
+  end
+end
+
+def time_period(hour)
+  if hour > 12
+    'PM'
+  else
+    'AM'
+  end
+end
+
 get '/' do
   now = Time.now.in_time_zone("Pacific Time (US & Canada)")
   @secret_coffee_time = SecretCoffee.secret_coffee_time?
@@ -154,5 +185,49 @@ get '/slack_request' do
 end
 
 get '/settings' do
+  secret_coffee_setting = SecretCoffeeSetting.last
+  start_time = secret_coffee_setting.range_start_time.in_time_zone("Pacific Time (US & Canada)")
+  end_time = start_time + secret_coffee_setting.range_length_minutes.minutes
+
+  @start_hour = convert_hour_for_use_with_period(start_time.hour)
+  @start_minute = start_time.min
+  @start_period = time_period(start_time.hour)
+
+  @end_hour = convert_hour_for_use_with_period(end_time.hour)
+  @end_minute = end_time.min
+  @end_period = time_period(end_time.hour)
+
   haml :settings
 end
+
+post '/settings' do
+  puts params
+
+  start_minute = params['start_minute'].to_i
+  start_period = params['start-period']
+  start_hour = convert_hour_for_no_period(params['start-hour'].to_i, start_period)
+  end_minute = params['end-minute'].to_i
+  end_period = params['end-period']
+  end_hour = convert_hour_for_no_period(params['end-hour'].to_i, end_period)
+
+  start_time = Time.new(2000, 1, 1, start_hour, start_minute)
+  end_time = Time.new(2000, 1, 1, end_hour, end_minute)
+
+  if start_time > end_time
+    flash[:error] = 'Start time cannot be before end time.'
+  else
+    minute_difference = (end_time - start_time) / 60
+
+    secret_coffee_setting = SecretCoffeeSetting.new(range_start_time: start_time,
+                                                    range_length_minutes: minute_difference)
+
+    if secret_coffee_setting.save
+      flash[:success] = 'Save Successful'
+    else
+      flash[:error] = secret_coffee_setting.errors
+    end
+  end
+
+  redirect to('/settings')
+end
+
