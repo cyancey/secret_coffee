@@ -186,16 +186,25 @@ end
 
 get '/settings' do
   secret_coffee_setting = SecretCoffeeSetting.last
-  start_time = secret_coffee_setting.range_start_time.in_time_zone("Pacific Time (US & Canada)")
-  end_time = start_time + secret_coffee_setting.range_length_minutes.minutes
+  if secret_coffee_setting
+    start_time = secret_coffee_setting.range_start_time.in_time_zone("Pacific Time (US & Canada)")
+    end_time = start_time + secret_coffee_setting.range_length_minutes.minutes
 
-  @start_hour = convert_hour_for_use_with_period(start_time.hour)
-  @start_minute = start_time.min
-  @start_period = time_period(start_time.hour)
+    @start_hour = convert_hour_for_use_with_period(start_time.hour)
+    @start_minute = start_time.min
+    @start_period = time_period(start_time.hour)
 
-  @end_hour = convert_hour_for_use_with_period(end_time.hour)
-  @end_minute = end_time.min
-  @end_period = time_period(end_time.hour)
+    @end_hour = convert_hour_for_use_with_period(end_time.hour)
+    @end_minute = end_time.min
+    @end_period = time_period(end_time.hour)
+  else
+    @start_hour = nil
+    @start_minute = nil
+    @start_period = nil
+    @end_hour = nil
+    @end_minute = nil
+    @end_period = nil
+  end
 
   haml :settings
 end
