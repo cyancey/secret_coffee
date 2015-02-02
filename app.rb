@@ -75,6 +75,35 @@ class SecretCoffee < ActiveRecord::Base
     message
   end
 
+  def self.send_slack_notification_if_time
+    now = Time.now.in_time_zone("Pacific Time (US & Canada)")
+    todays_coffee_runs = SecretCoffee.where(time: now.beginning_of_day..now.end_of_day)
+
+    send_notification = todays_coffee_runs.map do |secret_coffee|
+      !secret_coffee.notification_sent && (secret_coffee.time <= now)
+    end.include?(true)
+
+    if send_notification
+      Slack.post_message(todays_coffee_runs.last.to_slack_message)
+      todays_coffee_runs.each {|secret_coffee| secret_coffee.update_attributes(notification_sent: true)}
+      true
+    else
+      false
+    end
+  end
+
+  def self.emergency
+    unless SecretCoffee.last.notification_sent
+      SecretCoffee.last.update_attributes(time: Time.now)
+    end
+    
+    if SecretCoffee.send_slack_notification_if_time
+      'Emergency Secret Coffee Initiated'
+    else
+      'Emergency Secret Coffee Request Rejected'
+    end
+  end
+
   private
 
   def one_secret_coffee_run_per_day
@@ -88,6 +117,7 @@ class SecretCoffee < ActiveRecord::Base
       errors.add(:base, 'You can only do one secret coffee run per day')
     end
   end
+
 end
 
 class CoffeeQuote < ActiveRecord::Base
@@ -182,8 +212,14 @@ get '/api' do
 end
 
 get '/slack_request' do
-  content_type :text
-  SecretCoffee.status_message
+  puts params
+  if params['text'] == 'emergency'
+    content_type :text
+    SecretCoffee.emergency
+  else
+    content_type :text
+    SecretCoffee.status_message
+  end
 end
 
 get '/settings' do
