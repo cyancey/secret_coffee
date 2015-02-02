@@ -111,7 +111,9 @@ module Slack
 end
 
 def convert_hour_for_no_period(hour, period)
-  if period == 'PM'
+  if hour == 12
+    hour
+  elsif period == 'PM'
     hour + 12
   else
     hour
@@ -127,7 +129,7 @@ def convert_hour_for_use_with_period(hour)
 end
 
 def time_period(hour)
-  if hour > 12
+  if hour > 11
     'PM'
   else
     'AM'
